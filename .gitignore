@@ -1,0 +1,11 @@
+# исключаем имя и настройки проекта
+/.project
+/.classpath
+/.settings/
+/target/classes
+/target/test-classes
+/src/main/webapp/storage/*
+!/src/main/webapp/storage/help.txt
+!/src/main/webapp/storage/vamp.png
+/src/main/java/controller
+/src/main/java/view
