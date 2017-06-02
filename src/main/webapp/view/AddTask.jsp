@@ -41,6 +41,10 @@
 						<label for="inputDescription">Описание</label>
 						<textarea name="description" id="inputDescription" class="form-control" rows="5" placeholder="Введите описание задачи"></textarea>
 					</div>
+
+					<input name="command" type="hidden" value="add" /> 
+					<input name="journal" type="hidden" value="${journal.getTasks()}" /> 
+
 					<button type="submit" class="btn btn-default">Отправить</button>
 			</form>			
 		</div>

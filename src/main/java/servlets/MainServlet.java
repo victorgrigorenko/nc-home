@@ -5,18 +5,30 @@ import static constants.Constants.DATE_FORMAT;
 import static constants.Constants.HELP_FILE;
 import static constants.Constants.NONE;
 import static constants.Exception.IO;
+import static constants.Patterns.FILE_RG;
 import static constants.Command.*;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,39 +38,31 @@ import constants.Command;
 import model.Journal;
 import model.Journalable;
 import model.Task;
+import model.XMLJournal;
+import model.XMLJournalible;
 
 /**
  * Servlet implementation class MainServlet
  */
-@WebServlet(urlPatterns="/MainServlet", loadOnStartup=0)
+@WebServlet("/MainServlet")//urlPatterns="/MainServlet", loadOnStartup=0)
 public class MainServlet extends HttpServlet {
 	private Journalable<Task> journal;
-
-
-    private void initJournal(){
-    	journal = new Journal();
-    	// добавим задач для теста
-    	journal.addTask(journal.createTask("First Task", "description ...", new Date()));
-    	journal.addTask(journal.createTask("Задача №2", "desc desc des", new Date()));
-    	journal.addTask(journal.createTask("Задача №3", "test task", new Date()));
-    }
+	private XMLJournalible<Task> xml = new XMLJournal();
     
     public MainServlet() {
-    	initJournal();
+    	journal = null;
+//    	(Journalable<Task>) request.getSession().getAttribute("journal");
+//    	System.out.println((journal!=null)?"Успех":"Неудача");
 	}
     
     
     @Override
     public void init() throws ServletException{
 //    	Для начальной инициализации сервлета
-
+    	journal = null;//new Journal();
+    	//здесь можно было бы добавить первоначальную загрузку заданий
     }
-	private Date setupDate(String dateString) throws ParseException{ 
-		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-		//if (!validateField(dateString,DATE_RG)) notifyObservers(NOT_VERIFY_DATE_MSG+NEW_LINE);
-
-		return format.parse(dateString);
-	}
+    
     
 	public String getHelp() {
 		StringBuilder sb = new StringBuilder();
@@ -90,61 +94,59 @@ public class MainServlet extends HttpServlet {
 		
 		switch (command) {
 			case ADD: 
-				String s = String.valueOf(request.getSession().getAttribute("add"));
-				boolean added = (s!=null)?
-						Boolean.parseBoolean(s):
-						Boolean.parseBoolean(request.getParameter("add"));
-					if (added){
-						task = (Task) request.getAttribute("task");
-						journal.addTask(task);
-						//request.getSession().setAttribute("add", false);
-				    	request.getSession().removeAttribute("add");
-					}
-					else{
-						getServletContext().getRequestDispatcher("/view/AddTask.jsp").forward(request, response);
-					}
+
+				task = (Task) request.getAttribute("task");
+				if(task!=null){
+					journal.addTask(task);
+				}
 
 				break;
-			case DEL:	journal.deleteTask(request.getParameter("del"));
+				
+			case DEL: journal.deleteTask(request.getParameter("task"));
 				break;
+				
 			case SEARCH: 
-						task = journal.searchTask(request.getParameter("search"));
+						task = journal.searchTask(request.getParameter("task"));
 						String path = (task !=null)? "DisplayTask.jsp": "NotFoundTask.jsp";
 						request.setAttribute("task", task);
 						getServletContext().getRequestDispatcher("/view/"+path).forward(request, response);
 				break;
 			case EDIT:
-					String status = String.valueOf(request.getSession().getAttribute("edit"));
-					if ((status!=null)?Boolean.parseBoolean(status):false){
-//						journal.searchTaskOnID(request.getAttribute("id"));// тут поиск по ID
-//						//journal.replaceTask(title, task);
-						status = "false";
+					Date date = null;
+					try {
+						date = new SimpleDateFormat(DATE_FORMAT).parse(request.getParameter("date"));
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-					String title = request.getParameter("edit");
-					task = journal.searchTask(title);
-					request.setAttribute("task", task);
-					getServletContext().getRequestDispatcher("/view/EditTask.jsp").forward(request, response);
-				break;
-			case SHOW_ALL: 
+
+					journal.editTask(
+							request.getParameter("oldTitle"), 
+							request.getParameter("title"),
+							request.getParameter("description"), 
+							date);
 				break;
 			case CLEAR_ALL: journal.clearTasks();
 				break;
 			case RECORD: 
+
+//				if	(validateField(fileName,FILE_RG)){
+//					 xml.recordJournal(journal, fileName);
+//					message = SUCCESS_RECORD_TASK_MSG;
+//				}
+//				else
+//					message = NOT_SUCCESS_RECORD_TASK_MSG;
 				break;
 			case READ: 
+					journal = (Journalable<Task>) request.getAttribute("journal");
+					request.removeAttribute("journal");
 				break;
 			case HELP: 
-				String help = request.getParameter("help");
-				if(help.isEmpty()){
-					getServletContext().getRequestDispatcher("/HelpServlet").forward(request, response);
-				}
-				break;
-			case STOP: 
+				getServletContext().getRequestDispatcher("/HelpServlet").forward(request, response);
 				break;
 			case OTHER:
 			default:
 				System.out.println(NONE);
-				getServletContext().getRequestDispatcher("/view/MainContainer.jsp").forward(request, response);
 		}
 	}
 
@@ -152,24 +154,22 @@ public class MainServlet extends HttpServlet {
     	System.out.println(request.getSession().getMaxInactiveInterval());
 
     	String command = "";
-    	request.setAttribute("journal", journal);
+    	
+    	if(journal == null){
+    		journal = (Journal) request.getAttribute("journal");
+//    		journal = (Journal) request.getSession().getAttribute("journal");
+//    		request.getSession().removeAttribute("journal"); // если оставляем, то траблосы: Cannot forward after response has been committed
+    	}
 
-//    	request.getSession().removeAttribute("add"); 
-    	for (Enumeration<String> cmd = request.getSession().getAttributeNames();cmd.hasMoreElements();) {
-    		command = cmd.nextElement();
-    		System.out.println(command);
-    		Command commandOfEnum = Command.valueParse(command);
-    		commandParse(commandOfEnum,request,response);
-		}
-    	for (Enumeration<String> cmd = request.getParameterNames();cmd.hasMoreElements();) {
-    		command = cmd.nextElement();
-    		System.out.println(command);
-    		Command commandOfEnum = Command.valueParse(command);
-    		commandParse(commandOfEnum,request,response);
-		}
+		command = request.getParameter("command");
+		System.out.println(command);
+		Command cmd = Command.valueParse(command);
+		commandParse(cmd,request,response);
 
 //*******
-
+    	//request.getSession().setAttribute("journal", journal);
+    	request.setAttribute("journal", journal);
+    	
     	getServletContext().getRequestDispatcher("/view/MainContainer.jsp").forward(request, response);
     	
     	//response.getWriter().append("Served at: ").append(request.getContextPath());
@@ -180,7 +180,6 @@ public class MainServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

@@ -22,7 +22,7 @@ public interface Taskable {
 	
 	void setTitle(String title);
 	
-	String getDecsription();
+	String getDescription();
 	
 	void setDescription(String desc);
 	

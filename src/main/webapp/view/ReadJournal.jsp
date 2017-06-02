@@ -5,33 +5,25 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Display Task</title>
+		<title>Read Journal</title>
 		<%@ include file="Header.jsp" %>
 	</head>
 	<body style="background-color:#495f59;	color:#888">
 		<div class="container" style="background-color:aliceblue; min-height:100vh;">
 			<%@ include file="MainMenu.jsp" %>
 		
-			<h3>Просмотр задачи</h3>
-			<div class="container">
-				<div class="row">		
-					<div class="col-md-3">
-						<h4><c:out value="${task.getTitle()}:"/></h4>
-					</div>
-					<div class="col-md-9">
-						<h5><c:out value="${task.getDescription()}"/></h5>
-					</div>
+			<h3>Загрузка журнала</h3>
+		
+			<form role="form" method="POST" action="${pageContext.request.contextPath}/Read">			
+				<div class="form-group">
+					<label for="inputFile">Имя загружаемого журнала</label>
+					<input name="fileName" type="text" class="form-control" id="inputFile" placeholder="Введите имя файла без расширения">
 				</div>
-				<div class="row">
-					<div class="col-md-3">
-						<h4>Время выполнения: </h4>
-					</div>
-					<div class="col-md-9">
-						<h5><c:out value="${task.getStringDate()}"/></h5>
-					</div>	
-				
-				</div>
-			</div>
+
+				<input name="command" type="hidden" value="read" /> 
+
+				<button type="submit" class="btn btn-default">Загрузить</button>
+			</form>			
 		</div>
 	</body>
 </html>

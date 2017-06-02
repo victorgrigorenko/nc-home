@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import model.Journal;
 import model.Task;
 import model.Taskable;
 
@@ -25,15 +26,6 @@ import model.Taskable;
  */
 @WebServlet("/Add")
 public class Add extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Add() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 
 	private Date setupDate(String dateString) throws ParseException{ 
@@ -55,24 +47,40 @@ public class Add extends HttpServlet {
 		// TODO Auto-generated method stub
 		// сохраняем задачу в журнал..
 		request.setCharacterEncoding("UTF-8");
-		String title = (request.getParameter("title")!=null&&!request.getParameter("title").isEmpty())?
-				request.getParameter("title"):
-				"default title";
-		String description = (request.getParameter("description")!=null&&!request.getParameter("description").isEmpty())?
-				request.getParameter("description"):
-				"default description";
-		Date date = new Date();
-		try {
-			date = setupDate(request.getParameter("date"));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		Journal journal = new Journal();//(Journal)request.getAttribute("journal");
 		
-		request.getParameter("add");
-		Taskable task = new Task(title, description, date);
-		request.setAttribute("task", task);
+//		String title = (request.getParameter("title")!=null&&!request.getParameter("title").isEmpty())?
+//				request.getParameter("title"):
+//				"default title";
+//		String description = (request.getParameter("description")!=null&&!request.getParameter("description").isEmpty())?
+//				request.getParameter("description"):
+//				"default description";
+//		Date date = new Date();
+//		try {
+//			date = setupDate(request.getParameter("date"));
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
 
-		request.getSession().setAttribute("add", true);
+		//if (journal!=null){
+			String title = request.getParameter("title");
+			String desc = request.getParameter("description");
+			Date date = null;
+			try {
+				date = setupDate(request.getParameter("date"));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Task task = journal.createTask(title, desc, date);
+			//journal.addTask(task);
+		//}
+		//request.getParameter("add");
+		//Taskable task = new Task(title, description, date);
+		request.setAttribute("task", task);
+		String cmd = request.getParameter("command");
+		request.setAttribute("command", cmd);
+//		request.getSession().setAttribute("add", true);
 		
 		getServletContext().getRequestDispatcher("/MainServlet").forward(request, response);
 		doGet(request, response);

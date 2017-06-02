@@ -19,12 +19,12 @@ public class XMLJournal implements XMLJournalible<Task>{
 			throws JAXBException, FileNotFoundException {
 
 		FileOutputStream file = (fileName != null && !fileName.isEmpty())?
-				new FileOutputStream(PATH+"//"+fileName+".xml"):
-				new FileOutputStream(PATH+"//"+NAME);			
+				new FileOutputStream(fileName):
+				new FileOutputStream(NAME);			
 		
 		fileDefault = (fileName != null && !fileName.isEmpty())? 
-				new File(PATH+"//"+fileName+".xml"):
-				new File(PATH+"//"+NAME);
+				new File(fileName):
+				new File(NAME);
 		
 		JAXBContext jaxbContext = JAXBContext.newInstance(journal.getClass());
 		
@@ -38,8 +38,8 @@ public class XMLJournal implements XMLJournalible<Task>{
 	@SuppressWarnings("unchecked")
 	public Journalable<Task> readJournal(Journalable<Task> journal, String fileName) throws JAXBException {
 		File file = (fileName != null && !fileName.isEmpty())?
-				new File(PATH+"//"+fileName+".xml"): 
-				new File(PATH+"//"+fileDefault.getName()); 				
+				new File(fileName): 
+				new File(fileDefault.getName()); 				
         
 		JAXBContext jaxbContext = JAXBContext.newInstance(journal.getClass());
         Unmarshaller um = jaxbContext.createUnmarshaller();

@@ -784,6 +784,6 @@ standard deployment descriptor.
 <web-app xmlns:web="http://xmlns.jcp.org/xml/ns/javaee">
   <display-name>Archetype Created Web Application</display-name>
   <welcome-file-list>
-  	<welcome-file>MainServlet</welcome-file>
+    <welcome-file>InitServlet</welcome-file>
   </welcome-file-list>
 </web-app>

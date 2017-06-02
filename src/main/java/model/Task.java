@@ -87,7 +87,7 @@ public class Task implements Taskable{
 	}
 
 	@Override
-	public String getDecsription() {
+	public String getDescription() {
 		return description;
 	}
 
@@ -114,7 +114,7 @@ public class Task implements Taskable{
 	@Override
 	public String show(){
 		return "название: " + this.getTitle()
-		+"\nописание: "+ this.getDecsription()
+		+"\nописание: "+ this.getDescription()
 		+"\nдата: "+ getStringDate();
 	}
 
