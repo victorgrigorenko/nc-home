@@ -20,7 +20,8 @@
 					<input name="fileName" type="text" class="form-control" id="inputFile" placeholder="Введите имя файла без расширения">
 				</div>
 
-					<input name="command" type="hidden" value="record" /> 
+<!-- 					<input name="command" type="hidden" value="record" />  -->
+<%-- 					<c:set var="command" scope="session" value="record"/>  --%>
 					<input name="journal" type="hidden" value="${journal}" /> 
 
 					<button type="submit" class="btn btn-default">Сохранить</button>

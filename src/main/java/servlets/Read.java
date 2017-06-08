@@ -6,8 +6,7 @@ import static constants.ConstantMessage.READ_MSG;
 import static constants.ConstantMessage.RECORD_MSG;
 import static constants.ConstantMessage.SUCCESS_READ_TASK_MSG;
 import static constants.ConstantMessage.SUCCESS_RECORD_TASK_MSG;
-import static constants.Constants.HELP_FILE;
-import static constants.Constants.NONE;
+import static constants.Constants.*;
 import static constants.Exception.FILE_NOT_FOUND;
 import static constants.Exception.IO;
 import static constants.Exception.JAXB_READ;
@@ -49,7 +48,8 @@ public class Read extends HttpServlet {
 		String message;
 		try {
 			System.out.println(READ_MSG);
-			journal.replaceTasks(xml.readJournal(journal,getServletContext().getRealPath("storage/"+fileName+".xml")).getTasks());
+			String file = (fileName.isEmpty())? PATH+"/"+NAME : PATH+"/"+fileName+".xml";
+			journal.replaceTasks(xml.readJournal(journal,getServletContext().getRealPath(file)).getTasks());
 			message = SUCCESS_READ_TASK_MSG;
 			
 		} catch (JAXBException e) {
@@ -69,9 +69,11 @@ public class Read extends HttpServlet {
 		journal = new Journal();
 		String message = readJournal(request.getParameter("fileName"), request, response);
 		System.out.println(message);
-		request.setAttribute("journal", journal);
-//		request.setAttribute("command", "read");
-		getServletContext().getRequestDispatcher("/MainServlet").forward(request, response);
+		request.getSession().setAttribute("journal", journal);
+//		request.setAttribute("journal", journal);
+		
+		response.sendRedirect(getServletContext().getContextPath()+"/MainServlet");
+		//getServletContext().getRequestDispatcher("/MainServlet").forward(request, response);
 	}
 
 }

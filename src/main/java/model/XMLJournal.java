@@ -39,7 +39,7 @@ public class XMLJournal implements XMLJournalible<Task>{
 	public Journalable<Task> readJournal(Journalable<Task> journal, String fileName) throws JAXBException {
 		File file = (fileName != null && !fileName.isEmpty())?
 				new File(fileName): 
-				new File(fileDefault.getName()); 				
+				new File(NAME); 				
         
 		JAXBContext jaxbContext = JAXBContext.newInstance(journal.getClass());
         Unmarshaller um = jaxbContext.createUnmarshaller();

@@ -5,6 +5,7 @@
 /target/classes
 /target/test-classes
 /src/main/webapp/storage/*
+!/src/main/webapp/storage/default.xml
 !/src/main/webapp/storage/help.txt
 !/src/main/webapp/storage/vamp.png
 /src/main/java/controller

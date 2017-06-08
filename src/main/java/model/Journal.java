@@ -13,52 +13,48 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import observer.*;
-import static constants.Constants.*;
-
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)  
 @XmlType(name = "journalOfTask")
 public class Journal implements Journalable<Task>{
 
-	private static int countTasks;
+	//private static int countTasks;
 	
 	@XmlElement(required = true, name = "task") 
 	@XmlElementWrapper(name = "tasks")
 	private List<Task> taskList = new ArrayList<>();
 
-	private List<Observer> observers;
-
 	public Journal(){
-		countTasks = 0;
-		observers = new ArrayList<>();
+//		countTasks = 0;
 	}
 
 	@Override
-	public void addObserver(Observer o) {
-		if(o != null)
-			observers.add(o);
-	}
-
-	@Override
-	public void deleteObserver(Observer o) {
-		if(o != null)
-			observers.remove(o);
+	public int getFreeID(){ // вернуть свободный ID
+		Iterator<Task> iterator = taskList.iterator();
+		Task currentTask;
+		int tmpID = -1; // -1 состояние при котором свободный ID не найден
+		for(int i = 0; tmpID==-1; i++){
+			tmpID = i;
+			while(iterator.hasNext()){
+				currentTask = iterator.next();
+				if(currentTask.getID()==i){
+					tmpID = -1;
+					break;
+				}
+				if(currentTask.getID()!=i && !iterator.hasNext() && tmpID !=-1){
+					tmpID = i;
+				}
+			}
+		}
+		return tmpID;
 	}
 	
-	@Override
-	public void notifyObservers(Object arg) {
-		for (Observer observer : observers) 
-			observer.update(this,arg);  
-	}
-	
-
-	@Override
+	@Override 
 	public Task createTask(String title, String desc, Date date) {
 		if(title!=null && !title.isEmpty() && desc!=null && date!=null){
 			Task task = new Task(title, desc, date);
-			task.setID(countTasks);
+			task.setID(getFreeID());
 			return task;
 		}
 		
@@ -69,10 +65,9 @@ public class Journal implements Journalable<Task>{
 	public boolean addTask(Task task){
 		boolean result;
 		Task t = returnReferenceOnTask(task.getTitle());
-		if (t != null) taskList.remove(t); 
+		if (t != null && t.getDestructibleSatus()) 
+			taskList.remove(t); 
 		result = (taskList.add(task))? true: false;
-		countTasks = taskList.size();
-		notifyObservers(NONE);
 		return result;
 	}
 
@@ -80,19 +75,14 @@ public class Journal implements Journalable<Task>{
 	public void addTasks(List<? extends Task> list) {
 		if (list !=null && !list.isEmpty()){ 
 			taskList.addAll(list);
-			countTasks = taskList.size();
-			notifyObservers(NONE);
 		}
 	}
-
 
 	@Override
 	public boolean deleteTask(String title){
 		Task task = (title != null && !title.isEmpty())? returnReferenceOnTask(title): null;
-		if (task != null){
+		if (task != null && task.getDestructibleSatus()){
 			taskList.remove(task);
-			countTasks--;
-			notifyObservers(NONE);
 			return true; 
 		}
 
@@ -100,12 +90,21 @@ public class Journal implements Journalable<Task>{
 	}
 	
 	@Override
-	public void clearTasks(){
-		if (taskList != null && !taskList.isEmpty()){
-			taskList.clear();
-			countTasks = 0;
+	public void clearTasks(){ 
+		Iterator<Task> iterator = taskList.iterator();
+		Task currentTask;
+		while(iterator.hasNext()){
+			currentTask = iterator.next();
+			if(currentTask.getDestructibleSatus()){
+				iterator.remove();
+//				taskList.remove(currentTask);
+			}
 		}
-		notifyObservers(NONE);
+		
+//		if (taskList != null && !taskList.isEmpty()){
+//			taskList.clear();
+//			countTasks = 0;
+//		}
 	}
 	
 	@Override 
@@ -137,21 +136,21 @@ public class Journal implements Journalable<Task>{
 	@Override 
 	public boolean replaceTask(String title, Task task) {
 		if(title != null && !title.isEmpty() && task != null){
-			int index = taskList.indexOf(returnReferenceOnTask(title));
+			Task currentTask = returnReferenceOnTask(title);
+			int index = taskList.indexOf(currentTask);
 			if (index != -1){
+				task.setID(currentTask.getID()); // чтоб сохранять старый ID, для предотвращения коллизий
 				taskList.set(index, task);
-				notifyObservers(NONE);
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	@Override  
-	public void replaceTasks(List<? extends Task> list) {
+	@Override  // здесь полная очистка, заменяются даже неразрушимые задачи, возможно это не совсем верно
+	public void replaceTasks(List<? extends Task> list) { 
 		taskList.clear();
 		taskList.addAll(list);
-		notifyObservers(NONE);
 	}
 
 	@Override
@@ -176,17 +175,20 @@ public class Journal implements Journalable<Task>{
 			edited = true;
 		}
 		
-		notifyObservers(NONE);
 		return edited;
 	}
 	
 	@Override
 	public List<? extends Task> getTasks() {
 		return taskList;
-	}	
-	
-	@Override
-	public void update(Observable o, Object arg) {
-		notifyObservers(arg);
 	}
+
+	@Override
+	public Task getTask(int id) {
+		for (Task task : taskList) { 
+			if (task.getID() == id)
+				return task;
+		}
+		return null; 
+	}	
 }

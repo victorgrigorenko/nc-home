@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import model.Journal;
+import model.Journalable;
 import model.Task;
 import model.Taskable;
 
@@ -26,40 +28,39 @@ import model.Taskable;
 @WebServlet("/Edit")
 public class Edit extends HttpServlet {
 
-	public Edit() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
-
-	private Date setupDate(String dateString) throws ParseException{ 
-		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-		//if (!validateField(dateString,DATE_RG)) notifyObservers(NOT_VERIFY_DATE_MSG+NEW_LINE);
-
-		return format.parse(dateString);
-	}
-
+    // После редактирования
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doPost(request, response);
+		Date date = null;
+    	try {
+			date = new SimpleDateFormat(DATE_FORMAT).parse(request.getParameter("date"));
+			
+		} catch (ParseException e) {
+			System.out.println(NOT_VERIFY_DATE_MSG);
+		}
+
+    	Journal journal = (Journal) request.getSession().getAttribute("journal");
+    	journal.editTask(
+				request.getParameter("oldTitle"), 
+				request.getParameter("title"),
+				request.getParameter("description"), 
+				date);
+   
+    	request.getSession().setAttribute("journal", journal);
+    	
+    	response.sendRedirect(getServletContext().getContextPath()+"/MainServlet");
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
+    // До редактирования
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-		
-//		Task task = (Task) request.getAttribute("task");
-		String id = request.getParameter("id");
-//		String command = request.getParameter("command");
 
-		request.setAttribute("id", id);
+		request.setAttribute("id", request.getParameter("id"));
 		request.setAttribute("title", request.getParameter("title"));
 		request.setAttribute("description", request.getParameter("description"));
 		request.setAttribute("date", request.getParameter("date"));
-//		request.setAttribute("command", command);
-//		request.setAttribute("task", task);
 		
 		getServletContext().getRequestDispatcher("/view/EditTask.jsp").forward(request, response);
 	}

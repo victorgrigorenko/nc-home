@@ -9,18 +9,16 @@
 							<form action="${pageContext.request.contextPath}/view/AddTask.jsp" class="form-inline"> 
 								<a href="#first" class="navbar-brand" onClick="this.parentNode.submit(); return false;">
 									<span name="command" class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-									<input name="command" type="hidden" value="add" /> 
 								</a>	
 							</form>
 						</li>
 						<li>
-							<a href="${pageContext.request.contextPath}/MainServlet">Главная</a>
+							<a href="${pageContext.request.contextPath}/view/MainContainer.jsp">Главная</a>
 						</li> 
 					</ul> 
-					<form action="${pageContext.request.contextPath}/MainServlet" class="navbar-form navbar-left"> 
+					<form action="${pageContext.request.contextPath}/Search" class="navbar-form navbar-left"> 
 						<div class="form-group"> 
 							<input name="task" class="form-control" placeholder="Поиск"> 
-							<input name="command" type="hidden" value="search" /> 
 						</div> 
 						<button type="submit" class="btn btn-default">Поиск</button> 
 					</form> 
@@ -42,9 +40,8 @@
 								<li><a href="#">Уведомления</a></li> 
 								<li role="separator" class="divider"></li> 
 								<li>
-									<form action="${pageContext.request.contextPath}/MainServlet">
+									<form action="${pageContext.request.contextPath}/HelpServlet" method="post">
 										<a href="#" onClick="this.parentNode.submit(); return false;">Справка!</a>
-										<input name="command" type="hidden" value="help" /> 
 									</form> 
 								</li>
 							</ul> 

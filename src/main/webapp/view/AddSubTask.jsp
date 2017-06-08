@@ -5,7 +5,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Add Task</title>
+		<title>Add SubTask</title>
 		<%@ include file="Header.jsp" %>
         <script type="text/javascript">
             $(function () {
@@ -19,18 +19,19 @@
 		<div class="container" style="background-color:aliceblue; min-height:100vh;">
 			<%@ include file="MainMenu.jsp" %>
 		
-			<h3>Добавление задачи</h3>
-		
-			<form role="form" method="post" action="${pageContext.request.contextPath}/Add">			
+			<h3>Добавление подзадачи для задачи <c:out value="${title}"/></h3>
+			<form role="form" method="get" action="${pageContext.request.contextPath}/AddSubTask">			
+				<input name="ownerID" type="hidden" value="${id}" /> 
+				<input name="ownerTitle" type="hidden" value="${title}" /> 
+
 				<div class="form-group">
-					<label for="inputTitle">Название задачи</label>
-<%-- 					<c:if test="${edit}"> --%>
-					<input name="title" type="text" class="form-control" id="inputTitle" placeholder="Введите название задачи">
+					<label for="inputTitle">Название подзадачи</label>
+					<input name="title" type="text" class="form-control" id="inputTitle" placeholder="Введите название подзадачи">
 				</div>
 	            <div class="form-group">
-					<label for="datetimepicker">Дата и время выполнения задачи</label>
+					<label for="datetimepicker">Дата и время выполнения подзадачи</label>
 	                <div class='input-group date' id='datetimepicker'>
-	                    <input name="date" type='text' class="form-control" placeholder="Введите дату и время выполнения задачи (DD.MM.YYY hh:mm)"/>
+	                    <input name="date" type='text' class="form-control" placeholder="Введите дату и время выполнения подзадачи (DD.MM.YYY hh:mm)"/>
 	                    <span class="input-group-addon">
 	                        <span class="glyphicon glyphicon-calendar"></span>
 	                    </span>
@@ -39,11 +40,12 @@
 	
 					<div class="form-group">
 						<label for="inputDescription">Описание</label>
-						<textarea name="description" id="inputDescription" class="form-control" rows="5" placeholder="Введите описание задачи"></textarea>
+						<textarea name="description" id="inputDescription" class="form-control" rows="5" placeholder="Введите описание подзадачи"></textarea>
 					</div>
 
-						<c:set var="command" scope="session" value="add"/> 
+<!-- 					<input name="command" type="hidden" value="add subtask" />  -->
 <%-- 					<input name="journal" type="hidden" value="${journal.getTasks()}" />  --%>
+<%-- 					<input name="taskID" type="hidden" value="${task.getID()}" />  --%>
 					<button type="submit" class="btn btn-default">Отправить</button>
 			</form>			
 		</div>

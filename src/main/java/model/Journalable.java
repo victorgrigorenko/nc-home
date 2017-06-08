@@ -7,11 +7,11 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
-import observer.*;
-
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(name = "journalable")
-public interface Journalable<T extends Taskable> extends Observable, Observer{
+public interface Journalable<T extends Taskable>{
+	
+	int getFreeID();
 	
 	T createTask(String title, String desc, Date date);
 
@@ -32,4 +32,6 @@ public interface Journalable<T extends Taskable> extends Observable, Observer{
 	void clearTasks(); 
 	
 	T searchTask(String title);
+	
+	T getTask(int id);
 }

@@ -50,19 +50,11 @@ public class HelpServlet extends HttpServlet {
 		return sb.toString()+NEW_LINE;
 	}
     
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		request.setAttribute("help", getHelp());
-		
-		//String msg = (String) request.getServletContext().getAttribute("help");
-		//String ms4 = request.getParameter("help");
-		getServletContext().getRequestDispatcher("/view/Help.jsp").forward(request, response);
-	}
-
-
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//		String command = request.getParameter("command");
-		doGet(request, response);
+//		request.setAttribute("help", getHelp());
+		request.getSession().setAttribute("help", getHelp());
+		response.sendRedirect(getServletContext().getContextPath()+"/view/Help.jsp");
+//		getServletContext().getRequestDispatcher("/view/Help.jsp").forward(request, response);
 	}
 
 }

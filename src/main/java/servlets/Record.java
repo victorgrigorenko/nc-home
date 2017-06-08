@@ -78,7 +78,7 @@ public class Record extends HttpServlet {
 
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		journal = (Journal) request.getSession().getAttribute("journal");
+		journal = (Journal) request.getSession().getAttribute("journal"); /// ! роверять наличие журнала в сессии перед записью!!!
 		String message = recordJournal(request.getParameter("fileName"), request, response);
 		System.out.println(message);
 		getServletContext().getRequestDispatcher("/MainServlet").forward(request, response);

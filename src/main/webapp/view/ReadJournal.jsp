@@ -14,13 +14,11 @@
 		
 			<h3>Загрузка журнала</h3>
 		
-			<form role="form" method="POST" action="${pageContext.request.contextPath}/Read">			
+			<form role="form" method="post" action="${pageContext.request.contextPath}/Read">			
 				<div class="form-group">
 					<label for="inputFile">Имя загружаемого журнала</label>
 					<input name="fileName" type="text" class="form-control" id="inputFile" placeholder="Введите имя файла без расширения">
 				</div>
-
-				<input name="command" type="hidden" value="read" /> 
 
 				<button type="submit" class="btn btn-default">Загрузить</button>
 			</form>			

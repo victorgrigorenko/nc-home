@@ -2,16 +2,31 @@ package model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(name = "task")
-public class Task implements Taskable{
+public class Task implements Taskable, MapOfSubTaskable<Task>{
+
+	@XmlElement(required = true, name = "subTask") 
+	@XmlElementWrapper(name = "subTasks")
+	private Map<Integer, Task> mapOfSubTask = new LinkedHashMap<>(); // список подзадач
+	
+	@XmlElement
+	private int owner = -1; // id владельца задачи(верхний уровень -1 - без владельца)
+	
+	@XmlElement
+	private boolean destructible = true; // статус задачи(по дефолту уничтожаемая)
 
 	@XmlElement
 	private int id;
@@ -55,6 +70,14 @@ public class Task implements Taskable{
 		setTitle(title);
 		setDescription(desc);
 		setDate(date);
+	}
+
+	// для подзадачи
+	private Task(String title, String desc, Date date, int owner){
+		setTitle(title);
+		setDescription(desc);
+		setDate(date);
+		this.owner = owner;
 	}
 
 	@Override
@@ -120,7 +143,165 @@ public class Task implements Taskable{
 
 	@Override
 	public String getStringDate() {
-		// TODO Auto-generated method stub
 		return formatDate.format(getDate().getTime());
 	}
+
+	@Override
+	public int getOwner() {
+		return owner;
+	}
+
+	@Override
+	public boolean getDestructibleSatus() {
+		return destructible;
+	}
+
+	@Override
+	public void setDestructibleSatus(boolean status) {
+		destructible = status;
+	}
+
+	
+	// здесь и ниже методы для подзадач
+	
+	private int getFreeID(){ // вернуть свободный ID
+		Iterator<Entry<Integer, Task>> iterator = mapOfSubTask.entrySet().iterator();
+		Task currentTask;
+		int tmpID = -1; // -1 состояние при котором свободный ID не найден
+		for(int i = 0; tmpID==-1; i++){
+			tmpID = i;
+			while(iterator.hasNext()){
+				Entry<Integer, Task> entry = iterator.next();
+				currentTask = entry.getValue();
+//				tmpID = (currentTask.getID()!=i)? i: -1;
+				if(currentTask.getID()==i){
+					tmpID = -1;
+					break;
+				}
+				if(currentTask.getID()!=i && !iterator.hasNext() && tmpID !=-1){
+					tmpID = i;
+				}
+			}
+		}
+		return tmpID;
+	}
+
+	private Task returnReferenceOnTask(String title){ 
+		if (title == null || title.isEmpty()) 
+			return null; 
+
+		Iterator<Entry<Integer, Task>> iterator = mapOfSubTask.entrySet().iterator();
+		Task currentTask;
+		while(iterator.hasNext()){
+			Entry<Integer, Task> entry = iterator.next();
+			currentTask = entry.getValue();
+			if(currentTask.getTitle().equals(title))
+				return currentTask;
+		}
+		return null;			
+	}
+	
+	@Override
+	public Task createSubTask(String title, String desc, Date date) {
+		if(title!=null && !title.isEmpty() && desc!=null && date!=null){
+			Task task = new Task(title, desc, date, id); // owner - поле id текущей задачи
+			task.setID(getFreeID());
+			return task;
+		}
+		return null;
+	}
+
+	@Override
+	public void addSubTask(Task subTask) {
+		if(subTask != null){
+			mapOfSubTask.put(subTask.getID(), (Task)subTask);
+		}
+	}
+
+	@Override
+	public boolean replaceSubTask(String title, Task subTask) {
+		if(title != null && !title.isEmpty() && subTask != null){
+			Task currentTask = returnReferenceOnTask(title);
+			if(currentTask != null){
+				mapOfSubTask.replace(currentTask.getID(), (Task)currentTask, (Task)subTask);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean editSubTask(int id, String editTitle, String editDescription, Date editDate) {
+		Boolean edited = false; 
+		Task task = getSubTask(id); 
+		if (task == null)
+			return false;
+		
+		if(editTitle != null && !editTitle.isEmpty()){ 
+			task.setTitle(editTitle);
+			edited = true;
+		}
+
+		if(editDescription != null && !editDescription.isEmpty()){ 
+			task.setDescription(editDescription);
+			edited = true;
+		}
+
+		if(editDate != null){ 
+			task.setDate(editDate);
+			edited = true;
+		}
+		
+		return edited;
+	}
+
+	@Override
+	public Map<Integer, Task> getSubTasks() {
+		return mapOfSubTask;
+	}
+
+	@Override
+	public boolean deleteSubTask(int id) {		
+		Task task = getSubTask(id);
+		if (task != null && task.getDestructibleSatus()){
+			return mapOfSubTask.remove(task.getID(), task);
+		}
+		return false;			
+	}
+
+	@Override
+	public void clearSubTasks() {
+		Iterator<Entry<Integer,Task>> iterator = mapOfSubTask.entrySet().iterator();
+		while(iterator.hasNext()){
+			Entry<Integer, Task> entry = iterator.next();
+			if(entry.getValue().getDestructibleSatus()){
+				iterator.remove();
+			}
+		}
+		
+	}
+
+	@Override
+	public Task searchSubTask(String title) {
+		if (title == null || title.isEmpty()) 
+			return null; 
+
+		for(Entry<Integer, Task> entry: mapOfSubTask.entrySet()){
+			if(entry.getValue().getTitle().equals(title)){
+				return entry.getValue();
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public Task getSubTask(int id) {
+		for(Entry<Integer, Task> entry: mapOfSubTask.entrySet()){
+			if (entry.getKey() == id)
+				return entry.getValue();
+		}
+		return null; 
+	}	
+
+
 }

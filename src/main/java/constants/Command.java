@@ -3,6 +3,7 @@ package constants;
 public enum Command {
 	ADD("add"), DEL("del"), SEARCH("search"), EDIT("edit"), SHOW_ALL("show all"), 
 	CLEAR_ALL("clear all"), RECORD("record"), READ("read"), HELP("HELP"), STOP("stop"),
+	ADD_SUBTASK("add subtask"), DELETE_SUBTASK("delete subtask"), EDIT_SUBTASK("edit subtask"),
 	OTHER("Вы указали неверную команду");
 	
 	private final String command;

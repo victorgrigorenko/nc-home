@@ -13,7 +13,6 @@
 			<%@ include file="MainMenu.jsp" %>
 			<h3>Справка</h3>
 			<p><c:out value="${help}" default="Файл не найден" /></p>
-<%-- 			<h5>${help}</h5> --%>
 		</div>
 	</body>
 </html>
