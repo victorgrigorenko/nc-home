@@ -1,7 +1,6 @@
 package servlets;
 
 import static constants.ConstantMessage.DATE;
-import static constants.ConstantMessage.NEW_LINE;
 import static constants.ConstantMessage.NOT_VERIFY_DATE_MSG;
 import static constants.Constants.DATE_FORMAT;
 import static constants.Patterns.DATE_RG;
@@ -20,25 +19,22 @@ import javax.servlet.http.HttpServletResponse;
 import model.Journal;
 import model.Journalable;
 import model.Task;
-import model.Taskable;
 
-/**
- * Servlet implementation class Add
- */
-@WebServlet("/Edit")
-public class Edit extends HttpServlet {
+@WebServlet("/EditTask")
+public class EditTask extends HttpServlet {
+	Journalable<Task> journal;
 
-    // После редактирования
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Date date = null;
     	try {
 			date = new SimpleDateFormat(DATE_FORMAT).parse(request.getParameter("date"));
 			
 		} catch (ParseException e) {
-			System.out.println(NOT_VERIFY_DATE_MSG);
+			request.setAttribute("errorMsg", NOT_VERIFY_DATE_MSG);
+			getServletContext().getRequestDispatcher("/view/EditTask.jsp").forward(request, response);
 		}
 
-    	Journal journal = (Journal) request.getSession().getAttribute("journal");
+    	journal = (Journal) request.getSession().getAttribute("journal");
     	journal.editTask(
 				request.getParameter("oldTitle"), 
 				request.getParameter("title"),
@@ -50,19 +46,23 @@ public class Edit extends HttpServlet {
     	response.sendRedirect(getServletContext().getContextPath()+"/MainServlet");
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-    // До редактирования
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
+		journal = (Journal) request.getSession().getAttribute("journal");
 
-		request.setAttribute("id", request.getParameter("id"));
-		request.setAttribute("title", request.getParameter("title"));
-		request.setAttribute("description", request.getParameter("description"));
-		request.setAttribute("date", request.getParameter("date"));
-		
-		getServletContext().getRequestDispatcher("/view/EditTask.jsp").forward(request, response);
+		if(journal!=null){
+	
+			request.setAttribute("id", request.getParameter("id"));
+			request.setAttribute("title", request.getParameter("title"));
+			request.setAttribute("description", request.getParameter("description"));
+			request.setAttribute("date", request.getParameter("date"));
+			
+	    	Task task = journal.searchTask(request.getParameter("title"));
+			request.getSession().setAttribute("task", task);
+
+			getServletContext().getRequestDispatcher("/view/EditTask.jsp").forward(request, response);
+		} else
+			getServletContext().getRequestDispatcher("/view/ErrorPage.jsp").forward(request, response);		
 	}
 
 }

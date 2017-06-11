@@ -12,9 +12,6 @@ import model.Journal;
 import model.Journalable;
 import model.Task;
 
-/**
- * Servlet implementation class TestServlet
- */
 @WebServlet("/ClearAll")
 public class ClearAll extends HttpServlet {
 	private Journalable<Task> journal;
@@ -26,7 +23,6 @@ public class ClearAll extends HttpServlet {
 			request.getSession().setAttribute("journal", journal);
 		}
 		response.sendRedirect(getServletContext().getContextPath()+"/MainServlet");
-//		getServletContext().getRequestDispatcher("/MainServlet").forward(request, response);
 	}
 
 }

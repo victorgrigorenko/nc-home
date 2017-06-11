@@ -5,25 +5,28 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Read Journal</title>
+		<title>Error</title>
 		<%@ include file="Header.jsp" %>
 	</head>
 	<body style="background-color:#495f59;	color:#888">
 		<div class="container" style="background-color:aliceblue; min-height:100vh;">
 			<%@ include file="MainMenu.jsp" %>
 		
-			<h3>Загрузка журнала</h3>
-		
-			<form role="form" method="post" action="${pageContext.request.contextPath}/Read">			
-				<div class="form-group">
-					<label for="inputFile">Имя загружаемого журнала</label>
-					<input name="fileName" type="text" class="form-control" id="inputFile" placeholder="Введите имя файла без расширения">
-				</div>
-
-				<button type="submit" class="btn btn-default">Загрузить</button>
-			</form>	
-			
-		    <%@ include file="ErrorModal.jsp" %>
+			<h3>Ошибка <c:out value="${code}"/></h3>
+			<br>
+			<div class="container">
+			<div class="col-md-3">
+				<img src="${pageContext.request.contextPath}/storage/breaking.png" alt="...">
+			</div>
+			<div class="col-md-8">
+				<p class="lead">Что-то  пошло не так.. </p>
+				<c:if test="${not empty throwable}">
+					<p class=""><c:out value="${throwable.getClass().getName()}"/></p>
+					<p class=""><c:out value="${throwable.getMessage()}"/></p>
+				</c:if>
+			</div>
+			</div>
+				
 		</div>
 	</body>
 </html>

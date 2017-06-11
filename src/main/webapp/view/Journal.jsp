@@ -17,7 +17,7 @@
 						<td scope="row">${task.getDate()}</td> 
 	
 						<td>
-							<form action="${pageContext.request.contextPath}/Delete" method="post" class="form-inline">
+							<form action="${pageContext.request.contextPath}/DeleteTask" method="post" class="form-inline">
 								<a href="#" onClick="this.parentNode.submit(); return false;">       		   			
 									<span class="glyphicon glyphicon-trash"></span>
 <!-- 									<input name="command" type="hidden" value="del" />  -->
@@ -27,7 +27,7 @@
 							</form>
 		       			</td>
 							<td>
-								<form action="${pageContext.request.contextPath}/Edit" method="post" class="form-inline">
+								<form action="${pageContext.request.contextPath}/EditTask" method="post" class="form-inline">
 									<a href="#" onClick="this.parentNode.submit(); return false;">    
 										<span class="glyphicon glyphicon-pencil"></span>
 										<input name="id" type="hidden" value="${task.getID()}" /> 

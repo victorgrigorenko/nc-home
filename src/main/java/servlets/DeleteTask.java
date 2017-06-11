@@ -13,22 +13,25 @@ import model.Journalable;
 import model.Task;
 
 
-/**
- * Servlet implementation class TestServlet
- */
-@WebServlet("/DeleteSubTask")
-public class DeleteSubTask extends HttpServlet {
+@WebServlet("/DeleteTask")
+public class DeleteTask extends HttpServlet {
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doPost(request, response);
+	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8"); 
+
 		Journalable<Task> journal = (Journal) request.getSession().getAttribute("journal"); 
-		if(journal != null){
-			Task task = journal.getTask(Integer.parseInt(request.getParameter("owner")));
-			task.deleteSubTask(Integer.parseInt(request.getParameter("id")));
-			
+		if(journal!=null){
+			Task task = journal.searchTask(request.getParameter("task"));
+			task.clearSubTasks();
+			journal.deleteTask(request.getParameter("task"));
 			request.getSession().setAttribute("journal", journal);
 			response.sendRedirect(getServletContext().getContextPath()+"/MainServlet");
 		} else
-			getServletContext().getRequestDispatcher("/view/NotFoundTask.jsp").forward(request, response);		
+			getServletContext().getRequestDispatcher("/view/NotFoundTask.jsp").forward(request, response);
 	}
 
 }

@@ -781,9 +781,34 @@ standard deployment descriptor.
 		<url-pattern>/MyUrl</url-pattern>		
 	</servlet-mapping>
 -->
+
 <web-app xmlns:web="http://xmlns.jcp.org/xml/ns/javaee">
   <display-name>Archetype Created Web Application</display-name>
   <welcome-file-list>
     <welcome-file>InitServlet</welcome-file>
   </welcome-file-list>
+ 
+
+	<!-- error-code related error pages -->
+	<error-page>
+	    <error-code>404</error-code>
+	    <location>/ErrorHandler</location>
+	</error-page>
+	<error-page>
+	    <error-code>403</error-code>
+	    <location>/ErrorHandler</location>
+	</error-page>
+	
+	<!-- exception-type related error pages -->
+	<error-page>
+	    <exception-type>
+	          javax.servlet.ServletException
+	    </exception-type >
+	    <location>/ErrorHandler</location>
+	</error-page>
+	
+	<error-page>
+	    <exception-type>java.io.IOException</exception-type >
+	    <location>/ErrorHandler</location>
+	</error-page>    
 </web-app>

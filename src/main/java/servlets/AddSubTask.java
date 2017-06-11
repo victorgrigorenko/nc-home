@@ -18,28 +18,29 @@ import model.Journal;
 import model.Journalable;
 import model.Task;
 
-/**
- * Servlet implementation class Add
- */
 @WebServlet("/AddSubTask")
 public class AddSubTask extends HttpServlet {
-
+	Journalable<Task> journal;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Journalable<Task> journal = (Journal) request.getSession().getAttribute("journal");
+		journal = (Journal) request.getSession().getAttribute("journal");
 		if(journal!=null){
-	    	Task task = journal.searchTask(request.getParameter("ownerTitle"));
+	    	Task task = (Task) request.getSession().getAttribute("task");
 			Date date = null;
 	    	try {
 				date = new SimpleDateFormat(DATE_FORMAT).parse(request.getParameter("date"));
 				
 			} catch (ParseException e) {
-				System.out.println(NOT_VERIFY_DATE_MSG);
+
+				request.setAttribute("errorMsg", NOT_VERIFY_DATE_MSG);
 			}
 	    	Task subTask = task.createSubTask(
 				request.getParameter("title"),
 				request.getParameter("description"), 
 				date);
+			if (subTask == null){
+				getServletContext().getRequestDispatcher("/view/ErrorPage.jsp").forward(request, response);
+			}
 			task.addSubTask(subTask);
 		
 			request.getSession().setAttribute("journal", journal);
@@ -50,12 +51,18 @@ public class AddSubTask extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
+		journal = (Journal) request.getSession().getAttribute("journal");
 
-		request.setAttribute("id", request.getParameter("id"));
-		request.setAttribute("title", request.getParameter("title"));
-		
-		getServletContext().getRequestDispatcher("/view/AddSubTask.jsp").forward(request, response);
-		doGet(request, response);
+		if(journal!=null){
+			request.setAttribute("id", request.getParameter("id"));
+			request.setAttribute("title", request.getParameter("title"));
+			
+	    	Task task = journal.searchTask(request.getParameter("title"));
+			request.getSession().setAttribute("task", task);
+			
+			getServletContext().getRequestDispatcher("/view/AddSubTask.jsp").forward(request, response);
+		} else
+			getServletContext().getRequestDispatcher("/view/ErrorPage.jsp").forward(request, response);		
 	}
 
 }

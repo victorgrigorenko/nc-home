@@ -12,7 +12,7 @@
 		<div class="container" style="background-color:aliceblue; min-height:100vh;">
 			<%@ include file="MainMenu.jsp" %>
 		
-			<h3>Просмотр задачи</h3>
+			<h3>Задача не найдена</h3>
 			<br>
 			<div class="container">
 			<div class="col-md-3">

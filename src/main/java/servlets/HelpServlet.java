@@ -2,16 +2,12 @@ package servlets;
 
 import static constants.ConstantMessage.NEW_LINE;
 import static constants.Constants.HELP_FILE;
-import static constants.Constants.NONE;
-import static constants.Exception.FILE_NOT_FOUND;
 import static constants.Exception.IO;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,9 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-/**
- * Servlet implementation class TestServlet
- */
 @WebServlet("/HelpServlet")
 public class HelpServlet extends HttpServlet {
 	
@@ -51,10 +44,8 @@ public class HelpServlet extends HttpServlet {
 	}
     
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//		request.setAttribute("help", getHelp());
 		request.getSession().setAttribute("help", getHelp());
 		response.sendRedirect(getServletContext().getContextPath()+"/view/Help.jsp");
-//		getServletContext().getRequestDispatcher("/view/Help.jsp").forward(request, response);
 	}
 
 }

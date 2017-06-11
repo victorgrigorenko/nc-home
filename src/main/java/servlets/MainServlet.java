@@ -12,10 +12,7 @@ import model.Journal;
 import model.Journalable;
 import model.Task;
 
-/**
- * Servlet implementation class MainServlet
- */
-@WebServlet("/MainServlet")//urlPatterns="/MainServlet", loadOnStartup=0)
+@WebServlet("/MainServlet")
 public class MainServlet extends HttpServlet {
 	private Journalable<Task> journal = null;
 
@@ -32,7 +29,6 @@ public class MainServlet extends HttpServlet {
 //    	request.getSession().setAttribute("journal", journal);
     	
     	response.sendRedirect(getServletContext().getContextPath()+"/view/MainContainer.jsp");
-    	//getServletContext().getRequestDispatcher("/view/MainContainer.jsp").forward(request, response);
     	return;
 	}
 

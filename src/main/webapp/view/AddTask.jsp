@@ -21,16 +21,15 @@
 		
 			<h3>Добавление задачи</h3>
 		
-			<form role="form" method="post" action="${pageContext.request.contextPath}/Add">			
-				<div class="form-group">
-					<label for="inputTitle">Название задачи</label>
-<%-- 					<c:if test="${edit}"> --%>
-					<input name="title" type="text" class="form-control" id="inputTitle" placeholder="Введите название задачи">
+			<form role="form" method="post" action="${pageContext.request.contextPath}/AddTask">			
+				<div class="form-group has-feedback">
+					<label for="inputTitle" class="control-label">Название задачи</label>
+					<input required="required" name="title" type="text" class="form-control" id="inputTitle" placeholder="Введите название задачи">
 				</div>
 	            <div class="form-group">
 					<label for="datetimepicker">Дата и время выполнения задачи</label>
 	                <div class='input-group date' id='datetimepicker'>
-	                    <input name="date" type='text' class="form-control" placeholder="Введите дату и время выполнения задачи (DD.MM.YYY hh:mm)"/>
+	                    <input required="required" name="date" type='text' class="form-control" placeholder="Введите дату и время выполнения задачи (DD.MM.YYY hh:mm)"/>
 	                    <span class="input-group-addon">
 	                        <span class="glyphicon glyphicon-calendar"></span>
 	                    </span>
@@ -45,7 +44,9 @@
 						<c:set var="command" scope="session" value="add"/> 
 <%-- 					<input name="journal" type="hidden" value="${journal.getTasks()}" />  --%>
 					<button type="submit" class="btn btn-default">Отправить</button>
-			</form>			
+			</form>	
+
+		    <%@ include file="ErrorModal.jsp" %>
 		</div>
 	</body>
 </html>

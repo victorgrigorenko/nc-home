@@ -1,7 +1,6 @@
 package servlets;
 
 import static constants.ConstantMessage.DATE;
-import static constants.ConstantMessage.NEW_LINE;
 import static constants.ConstantMessage.NOT_VERIFY_DATE_MSG;
 import static constants.Constants.DATE_FORMAT;
 import static constants.Patterns.DATE_RG;
@@ -17,37 +16,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.coyote.Request;
-
 import model.Journalable;
 import model.Journal;
 import model.Task;
 import model.Taskable;
 
-/**
- * Servlet implementation class Add
- */
 @WebServlet("/EditSubTask")
 public class EditSubTask extends HttpServlet {
-
-
-
-	private Date setupDate(String dateString) throws ParseException{ 
-		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-		//if (!validateField(dateString,DATE_RG)) notifyObservers(NOT_VERIFY_DATE_MSG+NEW_LINE);
-
-		return format.parse(dateString);
-	}
+	Journalable<Task> journal;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	Journalable<Task> journal = (Journal) request.getSession().getAttribute("journal");
     	if (journal != null){
-	    	Task task = journal.searchTask(request.getParameter("ownerTitle"));
+	    	Task task = (Task) request.getSession().getAttribute("task");//journal.searchTask(request.getParameter("ownerTitle"));
 			Date date = null;			
 	    	try {
 				date = new SimpleDateFormat(DATE_FORMAT).parse(request.getParameter("date"));
 			} catch (ParseException e) {
-				System.out.println(NOT_VERIFY_DATE_MSG);
+				request.setAttribute("errorMsg", NOT_VERIFY_DATE_MSG);
+				getServletContext().getRequestDispatcher("/view/EditSubTask.jsp").forward(request, response);
 			}
 	    	
 			task.editSubTask( 
@@ -64,15 +51,26 @@ public class EditSubTask extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
+		journal = (Journal) request.getSession().getAttribute("journal");
 		
-		request.setAttribute("ownerTitle", request.getParameter("ownerTitle"));
-		request.setAttribute("owner", request.getParameter("owner"));
-		request.setAttribute("id", request.getParameter("id"));
-		request.setAttribute("title", request.getParameter("title"));
-		request.setAttribute("description", request.getParameter("description"));
-		request.setAttribute("date", request.getParameter("date"));
+		if(journal !=null){
 		
-		getServletContext().getRequestDispatcher("/view/EditSubTask.jsp").forward(request, response);
+			int id = Integer.parseInt(request.getParameter("id"));
+			request.setAttribute("ownerTitle", request.getParameter("ownerTitle"));
+			request.setAttribute("owner", request.getParameter("owner"));
+			request.setAttribute("id", id);
+			request.setAttribute("title", request.getParameter("title"));
+			request.setAttribute("description", request.getParameter("description"));
+			request.setAttribute("date", request.getParameter("date"));
+			
+	    	Task task = journal.searchTask(request.getParameter("ownerTitle"));
+	    	Task subtask = task.getSubTask(id);
+			request.getSession().setAttribute("task", task);
+			request.getSession().setAttribute("subtask", subtask);
+			
+			getServletContext().getRequestDispatcher("/view/EditSubTask.jsp").forward(request, response);
+		} else
+			getServletContext().getRequestDispatcher("/view/ErrorPage.jsp").forward(request, response);		
 	}
 
 }

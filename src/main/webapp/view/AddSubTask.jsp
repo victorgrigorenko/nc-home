@@ -26,12 +26,12 @@
 
 				<div class="form-group">
 					<label for="inputTitle">Название подзадачи</label>
-					<input name="title" type="text" class="form-control" id="inputTitle" placeholder="Введите название подзадачи">
+					<input required="required" name="title" type="text" class="form-control" id="inputTitle" placeholder="Введите название подзадачи">
 				</div>
 	            <div class="form-group">
 					<label for="datetimepicker">Дата и время выполнения подзадачи</label>
 	                <div class='input-group date' id='datetimepicker'>
-	                    <input name="date" type='text' class="form-control" placeholder="Введите дату и время выполнения подзадачи (DD.MM.YYY hh:mm)"/>
+	                    <input required="required" name="date" type='text' class="form-control" placeholder="Введите дату и время выполнения подзадачи (DD.MM.YYY hh:mm)"/>
 	                    <span class="input-group-addon">
 	                        <span class="glyphicon glyphicon-calendar"></span>
 	                    </span>
@@ -43,11 +43,9 @@
 						<textarea name="description" id="inputDescription" class="form-control" rows="5" placeholder="Введите описание подзадачи"></textarea>
 					</div>
 
-<!-- 					<input name="command" type="hidden" value="add subtask" />  -->
-<%-- 					<input name="journal" type="hidden" value="${journal.getTasks()}" />  --%>
-<%-- 					<input name="taskID" type="hidden" value="${task.getID()}" />  --%>
 					<button type="submit" class="btn btn-default">Отправить</button>
 			</form>			
+		    <%@ include file="ErrorModal.jsp" %>
 		</div>
 	</body>
 </html>

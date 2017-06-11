@@ -2,6 +2,7 @@ package servlets;
 
 import static constants.ConstantMessage.NEW_LINE;
 import static constants.ConstantMessage.NOT_SUCCESS_RECORD_TASK_MSG;
+import static constants.ConstantMessage.NOT_VERIFY_DATE_MSG;
 import static constants.ConstantMessage.RECORD_MSG;
 import static constants.ConstantMessage.SUCCESS_RECORD_TASK_MSG;
 import static constants.Constants.HELP_FILE;
@@ -34,9 +35,6 @@ import model.XMLJournal;
 import model.XMLJournalible;
 
 
-/**
- * Servlet implementation class TestServlet
- */
 @WebServlet("/Record")
 public class Record extends HttpServlet {
 	private Journalable<Task> journal;
@@ -48,7 +46,6 @@ public class Record extends HttpServlet {
 		return (matcher.matches());
 	}
 
-	// добавить информирование пользователя об успехе/неудаче
 	public String recordJournal(String fileName, HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		String message; 
 		try {
@@ -56,9 +53,9 @@ public class Record extends HttpServlet {
 				 xml.recordJournal(journal, getServletContext().getRealPath("storage/"+fileName+".xml"));
 				message = SUCCESS_RECORD_TASK_MSG;
 			}
-			else // если все плохо, пытаемся еще раз
-				getServletContext().getRequestDispatcher("/view/RecordJournal.jsp").forward(request, response);
+			else {
 				message = NOT_SUCCESS_RECORD_TASK_MSG;
+			}
 			
 		} catch (FileNotFoundException e) {
 			message = FILE_NOT_FOUND.toString();
@@ -69,7 +66,7 @@ public class Record extends HttpServlet {
 		} catch (JAXBException e) {
 			message = JAXB_RECORD.toString();
 		}
-		return message+NEW_LINE;
+		return message;
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -77,11 +74,16 @@ public class Record extends HttpServlet {
 	}
 
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		journal = (Journal) request.getSession().getAttribute("journal"); /// ! роверять наличие журнала в сессии перед записью!!!
-		String message = recordJournal(request.getParameter("fileName"), request, response);
-		System.out.println(message);
-		getServletContext().getRequestDispatcher("/MainServlet").forward(request, response);
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		journal = (Journal) request.getSession().getAttribute("journal"); 
+		String message;
+
+		message = recordJournal(request.getParameter("fileName"), request, response);
+		request.setAttribute("errorMsg", message);
+		if(SUCCESS_RECORD_TASK_MSG.equals(message))
+			getServletContext().getRequestDispatcher("/MainServlet").forward(request, response);
+		else
+			getServletContext().getRequestDispatcher("/view/RecordJournal.jsp").forward(request, response);
 	}
 
 }

@@ -2,6 +2,7 @@ package servlets;
 
 import static constants.ConstantMessage.NEW_LINE;
 import static constants.ConstantMessage.NOT_SUCCESS_RECORD_TASK_MSG;
+import static constants.ConstantMessage.NOT_VERIFY_DATE_MSG;
 import static constants.ConstantMessage.READ_MSG;
 import static constants.ConstantMessage.RECORD_MSG;
 import static constants.ConstantMessage.SUCCESS_READ_TASK_MSG;
@@ -36,9 +37,6 @@ import model.XMLJournal;
 import model.XMLJournalible;
 
 
-/**
- * Servlet implementation class TestServlet
- */
 @WebServlet("/Read")
 public class Read extends HttpServlet {
 	private Journalable<Task> journal;
@@ -53,10 +51,11 @@ public class Read extends HttpServlet {
 			message = SUCCESS_READ_TASK_MSG;
 			
 		} catch (JAXBException e) {
-			getServletContext().getRequestDispatcher("/view/ReadJournal.jsp").forward(request, response);
 			message = JAXB_READ.toString();
+			request.setAttribute("errorMsg", message);
+			getServletContext().getRequestDispatcher("/view/ReadJournal.jsp").forward(request, response);
 		}
-		return message+NEW_LINE;
+		return message;
 	}
 	
 
@@ -70,10 +69,8 @@ public class Read extends HttpServlet {
 		String message = readJournal(request.getParameter("fileName"), request, response);
 		System.out.println(message);
 		request.getSession().setAttribute("journal", journal);
-//		request.setAttribute("journal", journal);
 		
 		response.sendRedirect(getServletContext().getContextPath()+"/MainServlet");
-		//getServletContext().getRequestDispatcher("/MainServlet").forward(request, response);
 	}
 
 }

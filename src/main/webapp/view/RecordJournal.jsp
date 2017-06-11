@@ -26,6 +26,7 @@
 
 					<button type="submit" class="btn btn-default">Сохранить</button>
 			</form>			
+		    <%@ include file="ErrorModal.jsp" %>	
 		</div>
 	</body>
 </html>

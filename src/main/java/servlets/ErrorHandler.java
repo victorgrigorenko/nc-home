@@ -8,26 +8,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import model.Journal;
-import model.Journalable;
-import model.Task;
 
+@WebServlet("/ErrorHandler")
+public class ErrorHandler extends HttpServlet {
+	
 
-@WebServlet(urlPatterns="/InitServlet",loadOnStartup=0)
-public class InitServlet extends HttpServlet {	
-
-        
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doPost(request, response);
 	}
-
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Journalable<Task> journal = (Journal) request.getSession().getAttribute("journal");
-		if(journal == null)
-			journal = new Journal();
-		request.getSession().setAttribute("journal", journal);
-		getServletContext().getRequestDispatcher("/view/ReadJournal.jsp").forward(request, response);
-		
+      Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
+      int code = (int) request.getAttribute("javax.servlet.error.status_code");
+      
+      request.setAttribute("throwable", throwable);
+      request.setAttribute("code", code);
+
+		getServletContext().getRequestDispatcher("/view/ErrorPage.jsp").forward(request, response);
 	}
 
 }

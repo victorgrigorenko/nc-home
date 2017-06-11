@@ -21,18 +21,18 @@
 		
 			<h3>Правка задачи</h3>
 		
-			<form role="form" method="get" action="${pageContext.request.contextPath}/Edit">	
-				<input name="id" type="text" class="form-control" id="inputId" value="${id}" disabled>
+			<form role="form" method="get" action="${pageContext.request.contextPath}/EditTask">	
+				<input name="id" type="text" class="form-control" id="inputId" value="${task.getID()}" disabled>
 
 				<div class="form-group">
 					<label for="inputTitle">Название задачи</label>
-					<input name="title" type="text" class="form-control" id="inputTitle" value="${title}" placeholder="Введите название задачи">
-					<input name="oldTitle" type="hidden" value="${title}" /> 
+					<input required="required" name="title" type="text" class="form-control" id="inputTitle" value="${task.getTitle()}" placeholder="Введите название задачи">
+					<input name="oldTitle" type="hidden" value="${task.getTitle()}" /> 
 				</div>
 	            <div class="form-group">
 					<label for="datetimepicker">Дата и время выполнения задачи</label>
 	                <div class='input-group date' id='datetimepicker'>
-	                    <input name="date" type='text' class="form-control" value="${date}" placeholder="Введите дату и время выполнения задачи (DD.MM.YYY hh:mm)">
+	                    <input required="required" name="date" type='text' class="form-control" value="${task.getStringDate()}" placeholder="Введите дату и время выполнения задачи (DD.MM.YYY hh:mm)">
 	                    <span class="input-group-addon">
 	                        <span class="glyphicon glyphicon-calendar"></span>
 	                    </span>
@@ -41,11 +41,12 @@
 	
 				<div class="form-group">
 					<label for="inputDescription">Описание</label>
-					<textarea name="description" id="inputDescription" class="form-control" rows="5" placeholder="Введите описание задачи"><c:out value="${description}"/></textarea>
+					<textarea name="description" id="inputDescription" class="form-control" rows="5" placeholder="Введите описание задачи"><c:out value="${task.getDescription()}"/></textarea>
 				</div>
 
 				<button type="submit" class="btn btn-default">Отправить</button>
 			</form>			
+		    <%@ include file="ErrorModal.jsp" %>
 		</div>
 	</body>
 </html>

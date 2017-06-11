@@ -37,7 +37,6 @@
 										<a href="#" onClick="this.parentNode.submit(); return false;">Загрузить журнал</a>
 									</form>
 								</li> 
-								<li><a href="#">Уведомления</a></li> 
 								<li role="separator" class="divider"></li> 
 								<li>
 									<form action="${pageContext.request.contextPath}/HelpServlet" method="post">

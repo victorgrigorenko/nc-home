@@ -16,17 +16,19 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(name = "task")
-public class Task implements Taskable, MapOfSubTaskable<Task>{
+public class Task implements Taskable<Task>{
 
+	private FreeID freeID = new FreeID();
+	
 	@XmlElement(required = true, name = "subTask") 
 	@XmlElementWrapper(name = "subTasks")
-	private Map<Integer, Task> mapOfSubTask = new LinkedHashMap<>(); // список подзадач
+	private Map<Integer, Task> mapOfSubTask = new LinkedHashMap<>(); 
 	
 	@XmlElement
-	private int owner = -1; // id владельца задачи(верхний уровень -1 - без владельца)
+	private int owner = -1; 
 	
 	@XmlElement
-	private boolean destructible = true; // статус задачи(по дефолту уничтожаемая)
+	private boolean destructible = true; 
 
 	@XmlElement
 	private int id;
@@ -72,7 +74,6 @@ public class Task implements Taskable, MapOfSubTaskable<Task>{
 		setDate(date);
 	}
 
-	// для подзадачи
 	private Task(String title, String desc, Date date, int owner){
 		setTitle(title);
 		setDescription(desc);
@@ -162,28 +163,9 @@ public class Task implements Taskable, MapOfSubTaskable<Task>{
 	}
 
 	
-	// здесь и ниже методы для подзадач
-	
-	private int getFreeID(){ // вернуть свободный ID
-		Iterator<Entry<Integer, Task>> iterator = mapOfSubTask.entrySet().iterator();
-		Task currentTask;
-		int tmpID = -1; // -1 состояние при котором свободный ID не найден
-		for(int i = 0; tmpID==-1; i++){
-			tmpID = i;
-			while(iterator.hasNext()){
-				Entry<Integer, Task> entry = iterator.next();
-				currentTask = entry.getValue();
-//				tmpID = (currentTask.getID()!=i)? i: -1;
-				if(currentTask.getID()==i){
-					tmpID = -1;
-					break;
-				}
-				if(currentTask.getID()!=i && !iterator.hasNext() && tmpID !=-1){
-					tmpID = i;
-				}
-			}
-		}
-		return tmpID;
+
+	private int getFreeID(){ 
+		return freeID.getID(mapOfSubTask);
 	}
 
 	private Task returnReferenceOnTask(String title){ 
@@ -204,7 +186,7 @@ public class Task implements Taskable, MapOfSubTaskable<Task>{
 	@Override
 	public Task createSubTask(String title, String desc, Date date) {
 		if(title!=null && !title.isEmpty() && desc!=null && date!=null){
-			Task task = new Task(title, desc, date, id); // owner - поле id текущей задачи
+			Task task = new Task(title, desc, date, id); 
 			task.setID(getFreeID());
 			return task;
 		}
@@ -214,7 +196,7 @@ public class Task implements Taskable, MapOfSubTaskable<Task>{
 	@Override
 	public void addSubTask(Task subTask) {
 		if(subTask != null){
-			mapOfSubTask.put(subTask.getID(), (Task)subTask);
+			mapOfSubTask.put(subTask.getID(), subTask);
 		}
 	}
 
@@ -223,7 +205,7 @@ public class Task implements Taskable, MapOfSubTaskable<Task>{
 		if(title != null && !title.isEmpty() && subTask != null){
 			Task currentTask = returnReferenceOnTask(title);
 			if(currentTask != null){
-				mapOfSubTask.replace(currentTask.getID(), (Task)currentTask, (Task)subTask);
+				mapOfSubTask.replace(currentTask.getID(), currentTask, subTask);
 				return true;
 			}
 		}
@@ -264,7 +246,8 @@ public class Task implements Taskable, MapOfSubTaskable<Task>{
 	public boolean deleteSubTask(int id) {		
 		Task task = getSubTask(id);
 		if (task != null && task.getDestructibleSatus()){
-			return mapOfSubTask.remove(task.getID(), task);
+			freeID.addID(id);
+			return mapOfSubTask.remove(id, task);
 		}
 		return false;			
 	}
@@ -275,10 +258,10 @@ public class Task implements Taskable, MapOfSubTaskable<Task>{
 		while(iterator.hasNext()){
 			Entry<Integer, Task> entry = iterator.next();
 			if(entry.getValue().getDestructibleSatus()){
+				freeID.addID(entry.getKey());
 				iterator.remove();
 			}
 		}
-		
 	}
 
 	@Override
@@ -302,6 +285,4 @@ public class Task implements Taskable, MapOfSubTaskable<Task>{
 		}
 		return null; 
 	}	
-
-
 }

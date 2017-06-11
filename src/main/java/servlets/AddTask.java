@@ -18,15 +18,10 @@ import model.Journal;
 import model.Journalable;
 import model.Task;
 
-/**
- * Servlet implementation class Add
- */
-@WebServlet("/Add")
-public class Add extends HttpServlet {
+@WebServlet("/AddTask")
+public class AddTask extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		// сохраняем задачу в журнал..
 		request.setCharacterEncoding("UTF-8");
 		Journalable<Task> journal = (Journal) request.getSession().getAttribute("journal"); 		
 		
@@ -35,19 +30,22 @@ public class Add extends HttpServlet {
 			try {
 				date = new SimpleDateFormat(DATE_FORMAT).parse(request.getParameter("date"));
 			} catch (ParseException e) {
-				System.out.println(NOT_VERIFY_DATE_MSG);
+				
+				request.setAttribute("errorMsg", NOT_VERIFY_DATE_MSG);
 			}
 	
 			Task task = journal.createTask(
 					request.getParameter("title"), 
 					request.getParameter("description"), 
 					date); 
-			task.setID(journal.getFreeID());
+			if (task == null){
+				getServletContext().getRequestDispatcher("/view/AddTask.jsp").forward(request, response);
+			}
 			journal.addTask(task);
+			request.getSession().setAttribute("journal", journal);
 		}
 
 		response.sendRedirect(getServletContext().getContextPath()+"/MainServlet");
-		//getServletContext().getRequestDispatcher("/MainServlet").forward(request, response);
 	}
 
 }
